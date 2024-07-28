@@ -5,7 +5,7 @@
     state: directory
 
 - name: Install dependencies for building Nginx
-  aapt:
+  apt:
     name:
       - build-essential
       - libpcre3
