@@ -10,16 +10,26 @@
 - name: Install ACL, required for Ansible Super User
   apt: name=acl state=present update_cache=yes
 
-- name: Check if PostgreSQL is initialized
+- name: Check if PostgreSQL data directory exists
   stat:
-    path: "{{ postgresql_data_path }}/pg_hba.conf"
-  register: postgresql_initialized
-    
+    path: "{{ postgresql_data_path }}"
+  register: postgresql_data_dir
+
+- name: Check if PostgreSQL data directory is empty
+  command: find "{{ postgresql_data_path }}" -mindepth 1 -print -quit
+  register: postgresql_data_dir_contents
+  when: postgresql_data_dir.stat.exists
+  changed_when: false
+  failed_when: false
+
+- name: Clear PostgreSQL data directory if not empty
+  command: rm -rf "{{ postgresql_data_path }}/*"
+  when: postgresql_data_dir.stat.exists and postgresql_data_dir_contents.stdout != ""
+
 - name: Initialize PostgreSQL
   shell: "{{ postgresql_bin_path }}/initdb -D {{ postgresql_data_path }}"
-  become: true
   become_user: postgres
-  when: not postgresql_initialized.stat.exists
+  when: postgresql_data_dir.stat.exists == false or postgresql_data_dir_contents.stdout == ""
 
 - name: Start and enable PostgreSQL service
   service: name=postgresql state=started enabled=yes
