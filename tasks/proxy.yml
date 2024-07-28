@@ -81,7 +81,7 @@
     enabled: yes
 
 - name: Configure Nginx as a reverse proxy
-  emplate:
+  template:
     src: ./templates/nginx.conf.j2
     dest: /etc/nginx/sites-available/default
     owner: hng
