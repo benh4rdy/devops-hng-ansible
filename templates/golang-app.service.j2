@@ -1,0 +1,14 @@
+[Unit]
+Description=Golang Application Service
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/opt/stage_5b/production_app
+Restart=always
+User=hng
+StandardOutput=append:/var/log/devopsfetch.log
+StandardError=append:/var/log/devopsfetch.log
+
+[Install]
+WantedBy=multi-user.target
