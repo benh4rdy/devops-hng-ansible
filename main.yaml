@@ -1,0 +1,26 @@
+---
+- name: Setup Golang Application on a Virtual Machine
+  hosts: hng
+
+  vars_files:
+    - vars.yml
+
+  handlers:
+    - include: handlers/main.yml
+     
+  tasks:
+    - include: tasks/user.yml
+
+    - include: tasks/database.yml
+
+    - include: tasks/clone-repo.yml
+
+    - include: tasks/app.yml
+    
+    - include: tasks/proxy.yml
+
+    - include: tasks/
+
+    - include: tasks/
+
+    - include: tasks/

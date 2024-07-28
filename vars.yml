@@ -1,0 +1,16 @@
+---
+db_user: postgres
+db_passwd: password
+db_name: db_name
+secret_file: /var/secrets/pg_pw.txt
+pg_hba_conf: /etc/postgresql/14/main/pg_hba.conf
+postgresql_conf: /etc/postgresql/14/main/postgresql.conf
+app_log_directory: /var/log/stage_5b
+app_error_log: /var/log/stage_5b/error.log
+app_out_log: /var/log/stage_5b/out.log
+nginx_version: 1.24.0
+nginx_url: "https://nginx.org/download/nginx-{{ nginx_version }}.tar.gz"
+nginx_install_dir: /usr/local/nginx
+temp_dir: /tmp/nginx_install
+app_host: localhost
+app_port: 3000

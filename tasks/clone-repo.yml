@@ -1,0 +1,24 @@
+---
+- name: Clone the golang project repo
+  git: 
+    repo: https://github.com/hngprojects/hng_boilerplate_golang_web.git
+    dest: /opt/stage_5b
+    single_branch: yes
+    version: devops
+
+- name: Change file ownership, group and permissions
+  file:
+    path: /opt/stage_5b
+    state: directory
+    recurse: true
+    owner: hng
+    group: hng
+    mode: '0755'
+  
+- name: Switch to the laravel app directory
+  command: chdir=/opt/stage_5b ls
+
+- name: copy .env file to the app directory
+  copy:
+    src: ./templates/env
+    dest: /opt/stage_5b/.env

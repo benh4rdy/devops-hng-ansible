@@ -1,0 +1,16 @@
+---
+- name: Create the hng user
+  user:
+    name: hng
+    state: present
+    shell: /bin/bash
+    password: '*'
+    groups: sudo
+    append: yes
+    create_home: false
+
+- name: Add user hng to sudoers
+  copy:
+    dest: /etc/sudoers.d/hng
+    content: "hng ALL=(ALL) NOPASSWD:ALL"
+    mode: '0440'

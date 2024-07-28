@@ -1,0 +1,50 @@
+---
+- name: Install PostgreSQL
+  apt: name=postgresql-14 state=latest update_cache=yes
+    
+- name: Start and enable PostgreSQL service
+  service: name=postgresql state=started enabled=yes
+
+- name: Create a PostgreSQL database
+  postgresql_db: 
+    name: "{{ db_name }}"
+    login_user: "{{ db_user }}"
+    login_password: "{{ db_pass }}"
+
+- name: Create a PostgreSQL user
+  postgresql_user:
+    db: "{{db_name}}"
+    password: "{{ db_pass }}"
+    name: "{{db_user}}"
+    priv: "ALL"
+    login_user: "{{ db_user }}"
+    login_password: "{{ db_pass }}"
+
+- name: Save admin user credentials
+  ansible.builtin.file:
+    path: "{{ secret_file }}"
+    state: touch
+    mode: '0600'
+
+- name: Write admin user credentials to file
+  ansible.builtin.copy:
+    dest: "{{ secret_file }}"
+    content: |
+      admin_user: {{ db_user }}
+      admin_password: {{ db_pass }}
+    mode: '0600'
+
+- name: Allow remote connections in pg_hba.conf
+  ansible.builtin.lineinfile:
+    path: "{{ pg_hba_conf }}"
+    regexp: '^host'
+    line: 'host    all             all             0.0.0.0/0               md5'
+    create: yes
+
+- name: Listen for all addresses in postgresql.conf
+  ansible.builtin.lineinfile:
+    path: "{{ postgresql_conf }}"
+    regexp: '^#listen_addresses =.*'
+    line: "listen_addresses = '*'"
+    create: yes
+    notify: Restart PostgreSQL

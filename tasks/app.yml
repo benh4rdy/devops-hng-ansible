@@ -1,0 +1,43 @@
+---
+- name: install snap
+  apt: name=snapd
+
+- name: install core with snap
+  shell: snap install core
+    
+- name: refresh core with snap
+  shell: snap refresh core
+
+- name: install go with snap
+  shell: snap install go --classic
+
+- name: install application dependencies
+  shell: go mod download
+
+- name: Ensure the log directory exists
+  ansible.builtin.file:
+    path: "{{ app_log_directory }}"
+    state: directory
+    owner: hng
+    group: hng
+    mode: '0755'
+
+- name: Ensure the error log file exists
+  ansible.builtin.file:
+    path: "{{ app_error_log }}"
+    state: touch
+    owner: hng
+    group: hng
+    mode: '0644'
+
+- name: Ensure the out log file exists
+  ansible.builtin.file:
+    path: "{{ app_out_log }}"
+    state: touch
+    owner: hng
+    group: hng
+    mode: '0644'
+    
+- name: run go build
+  shell: |
+    nohup go run main.go > {{ app_out_log }} 2> {{ app_error_log }} &
