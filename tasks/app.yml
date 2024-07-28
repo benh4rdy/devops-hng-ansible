@@ -49,7 +49,7 @@
     state: touch
     owner: hng
     group: hng
-    mode: '0644'
+    mode: '0664'
 
 - name: Ensure the out log file exists
   file:
@@ -57,7 +57,7 @@
     state: touch
     owner: hng
     group: hng
-    mode: '0644'
+    mode: '0664'
 
 - name: Ensure log directory exists
   file:
@@ -79,6 +79,14 @@
   file:
     path: /opt/stage_5b/logs/error.log
     state: touch
+    owner: hng
+    group: hng
+    mode: '0644'
+
+- name: Configure Nginx as a reverse proxy
+  template:
+    src: ./templates/env
+    dest: /opt/stage_5b/app.env
     owner: hng
     group: hng
     mode: '0644'
