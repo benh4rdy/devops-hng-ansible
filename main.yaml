@@ -9,18 +9,13 @@
     - include: handlers/main.yml
      
   tasks:
-    - include: tasks/user.yml
+    - include_tasks: tasks/user.yml
 
-    - include: tasks/database.yml
+    - include_tasks: tasks/database.yml
 
-    - include: tasks/clone-repo.yml
+    - include_tasks: tasks/clone-repo.yml
 
-    - include: tasks/app.yml
+    - include_tasks: tasks/app.yml
     
-    - include: tasks/proxy.yml
+    - include_tasks: tasks/proxy.yml
 
-    - include: tasks/
-
-    - include: tasks/
-
-    - include: tasks/

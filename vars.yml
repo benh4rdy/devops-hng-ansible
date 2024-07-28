@@ -1,6 +1,6 @@
 ---
 db_user: postgres
-db_passwd: password
+db_pass: password
 db_name: db_name
 secret_file: /var/secrets/pg_pw.txt
 pg_hba_conf: /etc/postgresql/14/main/pg_hba.conf
