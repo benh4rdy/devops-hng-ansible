@@ -1,14 +1,48 @@
 ---
 - name: Install PostgreSQL and dependencies
-  apt: name={item} state=latest update_cache=yes
+  apt: name={{ item }} state=latest update_cache=yes
   loop:
   - postgresql
+  - postgresql-contrib
   - libpq-dev
   - python3-psycopg2
+
+- name: Check if PostgreSQL is initialized
+  stat:
+    path: "{{ postgresql_data_path }}/pg_hba.conf"
+  register: postgresql_initialized
     
+- name: Initialize PostgreSQL
+  shell: "{{ postgresql_bin_path }}/initdb -D {{ postgresql_data_path }}"
+  become_user: postgres
+  when: not postgresql_initialized.stat.exists
+
 - name: Start and enable PostgreSQL service
   service: name=postgresql state=started enabled=yes
 
+- name: Update pg_hba.conf to allow password authentication for postgres user
+  ansible.builtin.lineinfile:
+    path: "{{ pg_hba_conf }}"
+    regexp: '^local\s+all\s+postgres\s+peer$'
+    line: 'local   all             postgres                                md5'
+    state: present
+  notify: Restart PostgreSQL
+
+- name: Allow remote connections in pg_hba.conf
+  ansible.builtin.lineinfile:
+    path: "{{ pg_hba_conf }}"
+    regexp: '^host'
+    line: 'host    all             all             0.0.0.0/0               md5'
+    create: yes
+
+- name: Listen for all addresses in postgresql.conf
+  ansible.builtin.lineinfile:
+    path: "{{ postgresql_conf }}"
+    regexp: '^#listen_addresses =.*'
+    line: "listen_addresses = '*'"
+    create: yes
+  notify: Restart PostgreSQL
+  
 - name: Create a PostgreSQL database
   postgresql_db: 
     name: "{{ db_name }}"
@@ -38,17 +72,3 @@
       admin_password: {{ db_pass }}
     mode: '0600'
 
-- name: Allow remote connections in pg_hba.conf
-  ansible.builtin.lineinfile:
-    path: "{{ pg_hba_conf }}"
-    regexp: '^host'
-    line: 'host    all             all             0.0.0.0/0               md5'
-    create: yes
-
-- name: Listen for all addresses in postgresql.conf
-  ansible.builtin.lineinfile:
-    path: "{{ postgresql_conf }}"
-    regexp: '^#listen_addresses =.*'
-    line: "listen_addresses = '*'"
-    create: yes
-    notify: Restart PostgreSQL

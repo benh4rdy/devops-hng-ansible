@@ -6,7 +6,7 @@
     - vars.yml
 
   handlers:
-    - include: handlers/main.yml
+    - import_tasks: handlers/main.yml
      
   tasks:
     - include_tasks: tasks/user.yml
