@@ -61,6 +61,14 @@
   become_user: postgres
   notify: Restart PostgreSQL
 
+- name: Create a PostgreSQL database
+  postgresql_db: 
+    name: "{{ db_name }}"
+    state: present
+    login_user: "{{ db_user }}"
+    login_password: "{{ db_pass }}"
+  become_user: postgres
+
 - name: Create a PostgreSQL user
   postgresql_user:
     db: "{{db_name}}"
@@ -68,27 +76,27 @@
     encrypted: true
     name: "{{db_user}}"
     state: present
+  become_user: postgres
+
+- name: Create the secrets directory
+  file: 
+    path: "{{ secret_dir }}"
+    state: directory
+    mode: '0700'
 
 - name: Save admin user credentials
-  ansible.builtin.file:
-    path: "{{ secret_file }}"
+  file:
+    path: "{{ secret_dir }}{{ secret_file }}"
     state: touch
     mode: '0600'
 
 - name: Write admin user credentials to file
-  ansible.builtin.copy:
-    dest: "{{ secret_file }}"
+  copy:
+    dest: "{{ secret_dir }}{{ secret_file }}"
     content: |
       admin_user: {{ db_user }}
       admin_password: {{ db_pass }}
     mode: '0600'
-
-- name: Create a PostgreSQL database
-  postgresql_db: 
-    name: "{{ db_name }}"
-    state: present
-    login_user: "{{ db_user }}"
-    login_password: "{{ db_pass }}"
 
 - name: Grant db user access to db
   postgresql_privs:

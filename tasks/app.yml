@@ -23,7 +23,7 @@
     mode: '0755'
 
 - name: Ensure the error log file exists
-  ansible.builtin.file:
+  file:
     path: "{{ app_error_log }}"
     state: touch
     owner: hng
@@ -31,13 +31,13 @@
     mode: '0644'
 
 - name: Ensure the out log file exists
-  ansible.builtin.file:
+  file:
     path: "{{ app_out_log }}"
     state: touch
     owner: hng
     group: hng
     mode: '0644'
-    
+
 - name: run go build
   shell: |
     nohup go run main.go > {{ app_out_log }} 2> {{ app_error_log }} &

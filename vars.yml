@@ -6,7 +6,8 @@ ansible_ssh_pipelining: true
 db_user: postgres
 db_pass: password
 db_name: prod_db
-secret_file: /var/secrets/pg_pw.txt
+secret_dir: /var/secrets/
+secret_file: pg_pw.txt
 pg_hba_conf: /etc/postgresql/14/main/pg_hba.conf
 postgresql_conf: /etc/postgresql/14/main/postgresql.conf
 app_log_directory: /var/log/stage_5b
