@@ -59,6 +59,30 @@
     group: hng
     mode: '0644'
 
+- name: Ensure log directory exists
+  ansible.builtin.file:
+    path: /opt/stage_5b/logs
+    state: directory
+    owner: hng
+    group: hng
+    mode: '0755'
+
+- name: Create log files
+  ansible.builtin.file:
+    path: /opt/stage_5b/logs/app.log
+    state: touch
+    owner: hng
+    group: hng
+    mode: '0644'
+
+- name: Set permissions for log files
+  ansible.builtin.file:
+    path: /opt/stage_5b/logs/error.log
+    state: touch
+    owner: hng
+    group: hng
+    mode: '0644'
+
 - name: Run go build
   shell: |
     /usr/local/go/bin/go build -o {{ go_binary }} main.go

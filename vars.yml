@@ -10,6 +10,7 @@ secret_dir: /var/secrets/
 secret_file: pg_pw.txt
 pg_hba_conf: /etc/postgresql/14/main/pg_hba.conf
 postgresql_conf: /etc/postgresql/14/main/postgresql.conf
+app_repo: https://github.com/hngprojects/hng_boilerplate_golang_web.git
 app_log_directory: /var/log/stage_5b
 app_error_log: /var/log/stage_5b/error.log
 app_out_log: /var/log/stage_5b/out.log

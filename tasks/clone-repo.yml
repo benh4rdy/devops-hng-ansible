@@ -1,7 +1,7 @@
 ---
 - name: Clone the golang project repo
   git: 
-    repo: https://github.com/hngprojects/hng_boilerplate_golang_web.git
+    repo: "{{ app_repo }}"
     dest: /opt/stage_5b
     single_branch: yes
     version: devops
