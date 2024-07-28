@@ -40,6 +40,17 @@
   args:
     chdir: "{{ temp_dir }}/nginx-{{ nginx_version }}"
 
+- name: Create Nginx directories
+  ansible.builtin.file:
+    path: /etc/nginx/sites-available
+    state: directory
+
+- name: Create symlink for sites-enabled
+  ansible.builtin.file:
+    src: /etc/nginx/sites-available
+    dest: /etc/nginx/sites-enabled
+    state: link
+
 - name: Create Nginx systemd service file
   ansible.builtin.copy:
     dest: /etc/systemd/system/nginx.service
@@ -78,10 +89,5 @@
     mode: '0644'
 
 - name: Test Nginx configuration
-  ansible.builtin.shell: nginx -t
+  ansible.builtin.shell: "{{ nginx_install_dir }}/sbin/nginx -t"
   notify: Restart Nginx
-
-
-
-
-
