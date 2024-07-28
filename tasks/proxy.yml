@@ -1,6 +1,6 @@
 ---
 - name: Ensure temporary directory exists
-  ansible.builtin.file:
+  file:
     path: "{{ temp_dir }}"
     state: directory
 
@@ -18,41 +18,41 @@
     update_cache: yes
 
 - name: Download Nginx source tarball
-  ansible.builtin.get_url:
+  get_url:
     url: "{{ nginx_url }}"
     dest: "{{ temp_dir }}/nginx-{{ nginx_version }}.tar.gz"
 
 - name: Extract Nginx source tarball
-  ansible.builtin.unarchive:
+  unarchive:
     src: "{{ temp_dir }}/nginx-{{ nginx_version }}.tar.gz"
     dest: "{{ temp_dir }}"
     remote_src: yes
 
 - name: Configure Nginx
-  ansible.builtin.shell: |
+  shell: |
     ./configure --prefix={{ nginx_install_dir }} --with-http_ssl_module
   args:
     chdir: "{{ temp_dir }}/nginx-{{ nginx_version }}"
 
 - name: Build and install Nginx
-  ansible.builtin.shell: |
+  shell: |
     make && make install
   args:
     chdir: "{{ temp_dir }}/nginx-{{ nginx_version }}"
 
 - name: Create Nginx directories
-  ansible.builtin.file:
+  file:
     path: /etc/nginx/sites-available
     state: directory
 
 - name: Create symlink for sites-enabled
-  ansible.builtin.file:
+  file:
     src: /etc/nginx/sites-available
     dest: /etc/nginx/sites-enabled
     state: link
 
 - name: Create Nginx systemd service file
-  ansible.builtin.copy:
+  copy:
     dest: /etc/systemd/system/nginx.service
     content: |
       [Unit]
@@ -71,17 +71,17 @@
     mode: '0644'
 
 - name: Reload systemd to recognize new nginx service
-  ansible.builtin.systemd:
+  systemd:
     daemon_reload: yes
 
 - name: Enable and start Nginx service
-  ansible.builtin.service:
+  service:
     name: nginx
     state: started
     enabled: yes
 
 - name: Configure Nginx as a reverse proxy
-  ansible.builtin.template:
+  emplate:
     src: ./templates/nginx.conf.j2
     dest: /etc/nginx/sites-available/default
     owner: hng
@@ -89,5 +89,5 @@
     mode: '0644'
 
 - name: Test Nginx configuration
-  ansible.builtin.shell: "{{ nginx_install_dir }}/sbin/nginx -t"
+  shell: "{{ nginx_install_dir }}/sbin/nginx -t"
   notify: Restart Nginx

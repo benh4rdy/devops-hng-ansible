@@ -36,7 +36,7 @@
     msg: "Go version installed: {{ go_version_result.stdout }}"
 
 - name: Ensure the log directory exists
-  ansible.builtin.file:
+  file:
     path: "{{ app_log_directory }}"
     state: directory
     owner: hng
@@ -60,7 +60,7 @@
     mode: '0644'
 
 - name: Ensure log directory exists
-  ansible.builtin.file:
+  file:
     path: /opt/stage_5b/logs
     state: directory
     owner: hng
@@ -68,7 +68,7 @@
     mode: '0755'
 
 - name: Create log files
-  ansible.builtin.file:
+  file:
     path: /opt/stage_5b/logs/app.log
     state: touch
     owner: hng
@@ -76,7 +76,7 @@
     mode: '0644'
 
 - name: Set permissions for log files
-  ansible.builtin.file:
+  file:
     path: /opt/stage_5b/logs/error.log
     state: touch
     owner: hng
@@ -90,6 +90,12 @@
     chdir: /opt/stage_5b/
   environment:
     PATH: "{{ ansible_env.PATH }}:/usr/local/go/bin"
+
+- name: Ensure artifact belongs to hng user
+  file:
+    path: "{{ go_binary }}"
+    owner: hng
+    group: hng
 
 - name: Create systemd service for app
   copy:

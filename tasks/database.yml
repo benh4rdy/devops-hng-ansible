@@ -44,7 +44,7 @@
   notify: Restart PostgreSQL
 
 - name: Allow remote connections in pg_hba.conf
-  ansible.builtin.lineinfile:
+  lineinfile:
     path: "{{ pg_hba_conf }}"
     regexp: '^host'
     line: 'host    all             all             0.0.0.0/0               md5'
@@ -53,7 +53,7 @@
   notify: Restart PostgreSQL
 
 - name: Listen for all addresses in postgresql.conf
-  ansible.builtin.lineinfile:
+  lineinfile:
     path: "{{ postgresql_conf }}"
     regexp: '^#listen_addresses =.*'
     line: "listen_addresses = '*'"
