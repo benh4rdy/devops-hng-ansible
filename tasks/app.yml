@@ -65,23 +65,19 @@
     state: directory
     owner: hng
     group: hng
-    mode: '0666'
+    mode: '0755'
 
-- name: Create log files
+- name: Create symlink for error log
   file:
-    path: /opt/stage_5b/logs/app.log
-    state: touch
-    owner: hng
-    group: hng
-    mode: '0666'
-
-- name: Set permissions for log files
+    src: "{{ app_error_log }}"
+    dest: /opt/stage_5b/logs/error.log
+    state: link
+    
+- name: Create symlink for app log
   file:
-    path: /opt/stage_5b/logs/error.log
-    state: touch
-    owner: hng
-    group: hng
-    mode: '0644'
+    src: "{{ app_out_log }}"
+    dest: /opt/stage_5b/logs/app.log
+    state: link
 
 - name: Add environment variables
   template:
