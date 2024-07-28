@@ -83,7 +83,7 @@
     group: hng
     mode: '0644'
 
-- name: Configure Nginx as a reverse proxy
+- name: Add environment variables
   template:
     src: ./templates/env
     dest: /opt/stage_5b/app.env
