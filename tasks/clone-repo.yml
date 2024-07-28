@@ -5,6 +5,8 @@
     dest: /opt/stage_5b
     single_branch: yes
     version: devops
+    force: yes
+    update: yes
 
 - name: Change file ownership, group and permissions
   file:
@@ -15,7 +17,7 @@
     group: hng
     mode: '0755'
   
-- name: Switch to the laravel app directory
+- name: Switch to the golang app directory
   command: chdir=/opt/stage_5b ls
 
 - name: copy .env file to the app directory

@@ -47,3 +47,10 @@ a
 - golang 1.19 --------- deployment-server
 - nginx 1.26 --------- deployment-server
 - pm2
+
+
+# - name: install core with snap
+#   shell: snap install core
+    
+# - name: refresh core with snap
+#   shell: snap refresh core

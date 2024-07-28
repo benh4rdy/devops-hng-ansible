@@ -1,12 +1,6 @@
 ---
 - name: install snap
-  apt: name=snapd
-
-- name: install core with snap
-  shell: snap install core
-    
-- name: refresh core with snap
-  shell: snap refresh core
+  apt: name=snapd state=present update_cache=yes
 
 - name: install go with snap
   shell: snap install go --classic
