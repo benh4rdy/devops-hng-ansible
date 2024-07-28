@@ -5,7 +5,7 @@ postgresql_data_path: "/var/lib/postgresql/{{ postgresql_version }}//main"
 ansible_ssh_pipelining: true
 db_user: postgres
 db_pass: password
-db_name: db_name
+db_name: prod_db
 secret_file: /var/secrets/pg_pw.txt
 pg_hba_conf: /etc/postgresql/14/main/pg_hba.conf
 postgresql_conf: /etc/postgresql/14/main/postgresql.conf

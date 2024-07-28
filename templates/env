@@ -18,7 +18,7 @@ TIMEZONE=Africa/Lagos
 SSLMODE=disable
 USERNAME=postgres
 PASSWORD=password
-DB_NAME=db_name
+DB_NAME=prod_db
 MIGRATE=false
 
 # Test #

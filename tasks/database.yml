@@ -30,6 +30,7 @@
     regexp: '^local\s+all\s+postgres\s+peer$'
     line: 'local   all             postgres                                md5'
     state: present
+  become_user: postgres
   notify: Restart PostgreSQL
 
 - name: Allow remote connections in pg_hba.conf
@@ -38,6 +39,7 @@
     regexp: '^host'
     line: 'host    all             all             0.0.0.0/0               md5'
     create: yes
+  become_user: postgres
   notify: Restart PostgreSQL
 
 - name: Listen for all addresses in postgresql.conf
@@ -46,22 +48,17 @@
     regexp: '^#listen_addresses =.*'
     line: "listen_addresses = '*'"
     create: yes
+  become_user: postgres
   notify: Restart PostgreSQL
-  
-- name: Create a PostgreSQL database
-  postgresql_db: 
-    name: "{{ db_name }}"
-    login_user: "{{ db_user }}"
-    login_password: "{{ db_pass }}"
 
 - name: Create a PostgreSQL user
   postgresql_user:
-    db: "{{db_name}}"
+    # db: "{{db_name}}"
     password: "{{ db_pass }}"
     name: "{{db_user}}"
-    priv: "ALL"
-    login_user: "{{ db_user }}"
-    login_password: "{{ db_pass }}"
+    # priv: "ALL"
+    become_user: postgres
+    state: present
 
 - name: Save admin user credentials
   ansible.builtin.file:
@@ -77,3 +74,19 @@
       admin_password: {{ db_pass }}
     mode: '0600'
 
+- name: Create a PostgreSQL database
+  postgresql_db: 
+    name: "{{ db_name }}"
+    state: present
+    become_user: postgres
+    # login_user: "{{ db_user }}"
+    # login_password: "{{ db_pass }}"
+
+- name: Grant db user access to db
+  postgresql_privs:
+    type: database
+    database: "{{ db_name }}"
+    roles: "{{db_user}}"
+    privs: all
+    grant_option: false
+  become_user: postgres
