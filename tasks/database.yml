@@ -63,11 +63,10 @@
 
 - name: Create a PostgreSQL user
   postgresql_user:
-    # db: "{{db_name}}"
-    password: "{{ db_pass }}"
+    db: "{{db_name}}"
+    login_password: "{{ db_pass }}"
+    encrypted: true
     name: "{{db_user}}"
-    # priv: "ALL"
-    become_user: postgres
     state: present
 
 - name: Save admin user credentials
@@ -88,9 +87,8 @@
   postgresql_db: 
     name: "{{ db_name }}"
     state: present
-    become_user: postgres
-    # login_user: "{{ db_user }}"
-    # login_password: "{{ db_pass }}"
+    login_user: "{{ db_user }}"
+    login_password: "{{ db_pass }}"
 
 - name: Grant db user access to db
   postgresql_privs:
