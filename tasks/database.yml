@@ -7,6 +7,9 @@
   - libpq-dev
   - python3-psycopg2
 
+- name: Install ACL, required for Ansible Super User
+  apt: name=acl state=present update_cache=yes
+
 - name: Check if PostgreSQL is initialized
   stat:
     path: "{{ postgresql_data_path }}/pg_hba.conf"
@@ -14,6 +17,7 @@
     
 - name: Initialize PostgreSQL
   shell: "{{ postgresql_bin_path }}/initdb -D {{ postgresql_data_path }}"
+  become: true
   become_user: postgres
   when: not postgresql_initialized.stat.exists
 
@@ -21,7 +25,7 @@
   service: name=postgresql state=started enabled=yes
 
 - name: Update pg_hba.conf to allow password authentication for postgres user
-  ansible.builtin.lineinfile:
+  lineinfile:
     path: "{{ pg_hba_conf }}"
     regexp: '^local\s+all\s+postgres\s+peer$'
     line: 'local   all             postgres                                md5'
@@ -34,6 +38,7 @@
     regexp: '^host'
     line: 'host    all             all             0.0.0.0/0               md5'
     create: yes
+  notify: Restart PostgreSQL
 
 - name: Listen for all addresses in postgresql.conf
   ansible.builtin.lineinfile:
