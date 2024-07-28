@@ -65,7 +65,7 @@
     state: directory
     owner: hng
     group: hng
-    mode: '0755'
+    mode: '0666'
 
 - name: Create log files
   file:
@@ -73,7 +73,7 @@
     state: touch
     owner: hng
     group: hng
-    mode: '0644'
+    mode: '0666'
 
 - name: Set permissions for log files
   file:
