@@ -60,14 +60,15 @@
       After=network.target
 
       [Service]
-      ExecStart={{ nginx_install_dir }}/sbin/nginx
+      ExecStart=/usr/local/nginx/sbin/nginx
       ExecReload=/bin/kill -s HUP $MAINPID
       ExecStop=/bin/kill -s QUIT $MAINPID
-      PIDFile={{ nginx_install_dir }}/logs/nginx.pid
+      PIDFile=/usr/local/nginx/logs/nginx.pid
       Restart=always
 
       [Install]
       WantedBy=multi-user.target
+
     mode: '0644'
 
 - name: Reload systemd to recognize new nginx service
