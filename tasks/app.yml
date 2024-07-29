@@ -94,6 +94,7 @@
     chdir: /opt/stage_5b/
   environment:
     PATH: "{{ ansible_env.PATH }}:/usr/local/go/bin"
+  become_user: hng
 
 - name: Ensure artifact belongs to hng user
   file:
