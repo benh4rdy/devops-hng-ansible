@@ -1,94 +1,59 @@
 ---
-- name: Ensure temporary directory exists
-  file:
-    path: "{{ temp_dir }}"
-    state: directory
-
-- name: Install dependencies for building Nginx
+- name: Install prerequisites for Nginx 1.26
   apt:
     name:
-      - build-essential
-      - libpcre3
-      - libpcre3-dev
-      - zlib1g
-      - zlib1g-dev
-      - libssl-dev
-      - wget
+      - curl
+      - gnupg2
+      - ca-certificates
+      - lsb-release
+      - ubuntu-keyring
     state: present
     update_cache: yes
 
-- name: Download Nginx source tarball
-  get_url:
-    url: "{{ nginx_url }}"
-    dest: "{{ temp_dir }}/nginx-{{ nginx_version }}.tar.gz"
-
-- name: Extract Nginx source tarball
-  unarchive:
-    src: "{{ temp_dir }}/nginx-{{ nginx_version }}.tar.gz"
-    dest: "{{ temp_dir }}"
-    remote_src: yes
-
-- name: Configure Nginx
-  shell: |
-    ./configure --prefix={{ nginx_install_dir }} --with-http_ssl_module
+- name: Import the official NGINX signing key
+  command: curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor -o /usr/share/keyrings/nginx-archive-keyring.gpg
   args:
-    chdir: "{{ temp_dir }}/nginx-{{ nginx_version }}"
+    creates: /usr/share/keyrings/nginx-archive-keyring.gpg
 
-- name: Build and install Nginx
+- name: Verify the downloaded key
+  command: gpg --dry-run --quiet --no-keyring --import --import-options import-show /usr/share/keyrings/nginx-archive-keyring.gpg
+
+- name: Set up the apt repository for stable NGINX packages
   shell: |
-    make && make install
-  args:
-    chdir: "{{ temp_dir }}/nginx-{{ nginx_version }}"
+    echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] http://nginx.org/packages/ubuntu `lsb_release -cs` nginx" > /etc/apt/sources.list.d/nginx.list
 
-- name: Create Nginx directories
-  file:
-    path: /etc/nginx/sites-available
-    state: directory
+- name: Set up repository pinning for NGINX packages
+  shell: |
+    echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" > /etc/apt/preferences.d/99nginx
 
-- name: Create symlink for sites-enabled
-  file:
-    src: /etc/nginx/sites-available
-    dest: /etc/nginx/sites-enabled
-    state: link
+- name: Update apt cache
+  apt:
+    update_cache: yes
 
-- name: Create Nginx systemd service file
-  copy:
-    dest: /etc/systemd/system/nginx.service
-    content: |
-      [Unit]
-      Description=The NGINX HTTP and reverse proxy server
-      After=network.target
+- name: Install NGINX Open Source
+  apt:
+    name: nginx=1.26.*
+    state: present
 
-      [Service]
-      ExecStart=/usr/local/nginx/sbin/nginx
-      ExecReload=/bin/kill -s HUP $MAINPID
-      ExecStop=/bin/kill -s QUIT $MAINPID
-      PIDFile=/usr/local/nginx/logs/nginx.pid
-      Restart=always
-
-      [Install]
-      WantedBy=multi-user.target
-
-    mode: '0644'
-
-- name: Reload systemd to recognize new nginx service
-  systemd:
-    daemon_reload: yes
-
-- name: Enable and start Nginx service
+- name: Start NGINX
   service:
     name: nginx
     state: started
-    enabled: yes
+
+- name: Verify NGINX is running
+  command: curl -I 127.0.0.1
+  register: nginx_status
+
+- name: Display NGINX status
+  debug:
+    msg: "{{ nginx_status.stdout }}"
+
 
 - name: Configure Nginx as a reverse proxy
   template:
     src: ./templates/nginx.conf.j2
     dest: /etc/nginx/sites-available/default
-    owner: hng
-    group: hng
-    mode: '0644'
 
 - name: Test Nginx configuration
-  shell: "{{ nginx_install_dir }}/sbin/nginx -t"
+  shell: nginx -t
   notify: Restart Nginx
