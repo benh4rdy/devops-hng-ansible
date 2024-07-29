@@ -57,7 +57,7 @@
 - name: Configure Nginx as a reverse proxy
   template:
     src: ./templates/nginx.conf.j2
-    dest: /etc/nginx/sites-available/default
+    dest: /etc/nginx/conf.d/default.conf
 
 - name: Test Nginx configuration
   shell: nginx -t

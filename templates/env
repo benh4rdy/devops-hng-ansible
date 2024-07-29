@@ -16,8 +16,8 @@ DB_PORT=5432
 DB_CONNECTION=pgsql
 TIMEZONE=Africa/Lagos
 SSLMODE=disable
-USERNAME=postgres
-PASSWORD=password
+USERNAME=hngpostgres
+PASSWORD=R1donnend
 DB_NAME=prod_db
 MIGRATE=false
 
