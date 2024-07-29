@@ -7,7 +7,7 @@
     password: '*'
     groups: sudo
     append: yes
-    create_home: false
+    create_home: true
 
 - name: Add user hng to sudoers
   copy:
