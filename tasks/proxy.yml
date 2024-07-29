@@ -24,7 +24,7 @@
 
 - name: Set up repository pinning for NGINX packages
   shell: |
-    echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" > /etc/apt/preferences.d/99nginx
+    echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" | tee /etc/apt/preferences.d/99nginx
 
 - name: Update apt cache
   apt:

@@ -1,7 +1,7 @@
 ---
-- name: Configure Git to add /opt/stage_5b as a safe directory
-  command: git config --global --add safe.directory /opt/stage_5b
-  become_user: hng
+# - name: Configure Git to add /opt/stage_5b as a safe directory
+#   command: git config --global --add safe.directory /opt/stage_5b
+#   become_user: hng
 
 - name: Clone the golang project repo
   git: 
@@ -11,6 +11,7 @@
     version: devops
     force: yes
     update: yes
+  become_user: hng
 
 - name: Change file ownership, group and permissions
   file:
