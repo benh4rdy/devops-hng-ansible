@@ -72,12 +72,18 @@
     src: "{{ app_error_log }}"
     dest: /opt/stage_5b/logs/error.log
     state: link
+    owner: hng
+    group: hng
+    mode: 0644
     
 - name: Create symlink for app log
   file:
     src: "{{ app_out_log }}"
     dest: /opt/stage_5b/logs/app.log
     state: link
+    owner: hng
+    group: hng
+    mode: '0644'
 
 - name: Add environment variables
   template:
