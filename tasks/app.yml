@@ -108,7 +108,7 @@
 - name: Run Golang application as hng user
   ansible.builtin.shell: sudo -u hng /opt/stage_5b/"{{ go_binary }}" &
   args:
-    chdir: /opt/stage_5b
+    chdir: /opt/stage_5b/
   async: 0
   poll: 0
   register: golang_app_result

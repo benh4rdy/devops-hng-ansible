@@ -25,4 +25,4 @@ go_tarball: "go{{ go_version }}.linux-amd64.tar.gz"
 go_download_url: "https://go.dev/dl/{{ go_tarball }}"
 go_install_path: "/usr/local/go"
 profile_file: "/etc/profile"
-go_binary: "/opt/stage_5b/production_app"
+go_binary: production_app
