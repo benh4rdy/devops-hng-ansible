@@ -7,7 +7,6 @@
     version: devops
     force: yes
     update: yes
-  become_user: hng
 
 - name: Change file ownership, group and permissions
   file:

@@ -87,30 +87,34 @@
     group: hng
     mode: '0644'
 
-- name: Run go build
-  shell: |
-    /usr/local/go/bin/go build -o {{ go_binary }} main.go
+- name: Build Golang application
+  ansible.builtin.shell: go build -o "{{ go_binary }}" /opt/stage_5b/main.go
   args:
-    chdir: /opt/stage_5b/
-  environment:
-    PATH: "{{ ansible_env.PATH }}:/usr/local/go/bin"
-  become_user: hng
+    creates: /opt/stage_5b/myapp
 
 - name: Ensure artifact belongs to hng user
-  file:
-    path: "{{ go_binary }}"
+  ansible.builtin.file:
+    path: /opt/stage_5b/"{{ go_binary }}"
     owner: hng
     group: hng
 
-- name: Create systemd service for app
-  copy:
-    src: ./templates/golang-app.service.j2
-    dest: /etc/systemd/system/golang-app.service
-  notify: 
-    - Reload systemd
+- name: Run Golang application as hng user
+  ansible.builtin.shell: sudo -u hng /opt/stage_5b/"{{ go_binary }}" &
+  args:
+    chdir: /opt/stage_5b
+  async: 0
+  poll: 0
+  register: golang_app_result
 
-- name: Enable Golang app service on boot
-  systemd:
-    name: golang-app
-    enabled: yes
-    state: started
+- name: Wait for Golang application to start
+  ansible.builtin.pause:
+    seconds: 5
+
+- name: Check if Golang application is running
+  ansible.builtin.shell: pgrep -f /opt/stage_5b/"{{ go_binary }}"
+  register: golang_app_running
+
+- name: Fail if Golang application is not running
+  ansible.builtin.fail:
+    msg: "Golang application failed to start."
+  when: golang_app_running.rc != 0
