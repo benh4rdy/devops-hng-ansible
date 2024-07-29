@@ -1,4 +1,3 @@
----
 - name: Remove any previous Go installation
   file:
     path: "{{ go_install_path }}"
@@ -75,7 +74,7 @@
     owner: hng
     group: hng
     mode: 0644
-    
+
 - name: Create symlink for app log
   file:
     src: "{{ app_out_log }}"
@@ -94,19 +93,19 @@
     mode: '0644'
 
 - name: Build Golang application
-  ansible.builtin.shell: "go build -o {{ go_binary }} /opt/stage_5b/main.go"
+  shell: "PATH=$PATH:/usr/local/go/bin go build -o {{ go_binary }} /opt/stage_5b/main.go"
   args:
     creates: "/opt/stage_5b/{{ go_binary }}"
     chdir: /opt/stage_5b/
 
 - name: Ensure artifact belongs to hng user
-  ansible.builtin.file:
+  file:
     path: "/opt/stage_5b/{{ go_binary }}"
     owner: hng
     group: hng
 
 - name: Run Golang application as hng user
-  ansible.builtin.shell: sudo -u hng /opt/stage_5b/"{{ go_binary }}" &
+  shell: sudo -u hng /opt/stage_5b/"{{ go_binary }}" &
   args:
     chdir: /opt/stage_5b/
   async: 0
@@ -114,14 +113,14 @@
   register: golang_app_result
 
 - name: Wait for Golang application to start
-  ansible.builtin.pause:
+  pause:
     seconds: 5
 
 - name: Check if Golang application is running
-  ansible.builtin.shell: "pgrep -f /opt/stage_5b/{{ go_binary }}"
+  shell: "pgrep -f /opt/stage_5b/{{ go_binary }}"
   register: golang_app_running
 
 - name: Fail if Golang application is not running
-  ansible.builtin.fail:
+  fail:
     msg: "Golang application failed to start."
   when: golang_app_running.rc != 0
