@@ -96,7 +96,7 @@
 - name: Build Golang application
   ansible.builtin.shell: go build -o "{{ go_binary }}" /opt/stage_5b/main.go
   args:
-    creates: /opt/stage_5b/{{ go_binary }}
+    creates: /opt/stage_5b/"{{ go_binary }}"
     chdir: /opt/stage_5b/
 
 - name: Ensure artifact belongs to hng user
