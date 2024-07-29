@@ -11,12 +11,12 @@
     update_cache: yes
 
 - name: Import the official NGINX signing key
-  command: curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor -o /usr/share/keyrings/nginx-archive-keyring.gpg
+  shell: curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor -o /usr/share/keyrings/nginx-archive-keyring.gpg
   args:
     creates: /usr/share/keyrings/nginx-archive-keyring.gpg
 
 - name: Verify the downloaded key
-  command: gpg --dry-run --quiet --no-keyring --import --import-options import-show /usr/share/keyrings/nginx-archive-keyring.gpg
+  shell: gpg --dry-run --quiet --no-keyring --import --import-options import-show /usr/share/keyrings/nginx-archive-keyring.gpg
 
 - name: Set up the apt repository for stable NGINX packages
   shell: |
