@@ -65,14 +65,14 @@
   postgresql_db: 
     name: "{{ db_name }}"
     state: present
-    login_user: "{{ db_user }}"
-    login_password: "{{ db_pass }}"
+    # login_user: "{{ db_user }}"
+    # login_password: "{{ db_pass }}"
   become_user: postgres
 
 - name: Create a PostgreSQL user
   postgresql_user:
     db: "{{db_name}}"
-    login_password: "{{ db_pass }}"
+    password: "{{ db_pass }}"
     encrypted: true
     name: "{{db_user}}"
     state: present
