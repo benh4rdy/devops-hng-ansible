@@ -1,0 +1,30 @@
+- name: Ensure UFW is installed
+  apt:
+    name: ufw
+    state: present
+    update_cache: yes
+
+- name: Allow localhost access to the application port
+  ufw:
+    rule: allow
+    port: "{{ app_port }}"
+    proto: tcp
+    from_ip: 127.0.0.1
+
+- name: Deny external access to the application port
+  ufw:
+    rule: deny
+    port: "{{ app_port }}"
+    proto: tcp
+
+- name: Ensure UFW is enabled
+  ufw:
+    state: enabled
+    policy: allow
+
+- name: Ensure UFW status is active
+  command: ufw status
+  register: ufw_status
+
+- debug:
+    var: ufw_status.stdout

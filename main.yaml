@@ -9,13 +9,15 @@
     - import_tasks: handlers/main.yml
      
   tasks:
-    - include_tasks: tasks/user.yml
+    - include_tasks: tasks/create_user.yml
 
-    - include_tasks: tasks/database.yml
+    - include_tasks: tasks/setup_database.yml
 
     - include_tasks: tasks/clone-repo.yml
 
-    - include_tasks: tasks/app.yml
+    - include_tasks: tasks/firewall.yml
+
+    - include_tasks: tasks/setup_app.yml
     
-    - include_tasks: tasks/proxy.yml
+    - include_tasks: tasks/setup_proxy.yml
 
