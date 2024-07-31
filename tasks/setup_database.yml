@@ -2,13 +2,40 @@
 - name: Install PostgreSQL and dependencies
   apt: name={{ item }} state=latest update_cache=yes
   loop:
-  - postgresql
-  - postgresql-contrib
-  - libpq-dev
-  - python3-psycopg2
+    - postgresql
+    - postgresql-contrib
+    - libpq-dev
+    - python3-psycopg2
 
 - name: Install ACL, required for Ansible Super User
   apt: name=acl state=present update_cache=yes
+
+- name: Check if PostgreSQL is installed
+  command: psql --version
+  register: postgresql_version_check
+  ignore_errors: yes
+
+- name: Fail if PostgreSQL is not installed
+  fail:
+    msg: "PostgreSQL is not installed"
+  when: postgresql_version_check.rc != 0
+
+- name: Locate initdb binary
+  find:
+    paths: /usr/lib
+    patterns: initdb
+    recurse: yes
+  register: initdb_search
+
+- name: Set initdb path variable
+  set_fact:
+    initdb_path: "{{ initdb_search.files[0].path }}"
+  when: initdb_search.matched > 0
+
+- name: Fail if initdb binary is not found
+  fail:
+    msg: "initdb binary not found"
+  when: initdb_search.matched == 0
 
 - name: Check if PostgreSQL data directory exists
   stat:
@@ -27,12 +54,29 @@
   when: postgresql_data_dir.stat.exists and postgresql_data_dir_contents.stdout != ""
 
 - name: Initialize PostgreSQL
-  shell: "{{ postgresql_bin_path }}/initdb -D {{ postgresql_data_path }}"
+  shell: "{{ initdb_path }} -D {{ postgresql_data_path }}"
   become_user: postgres
   when: postgresql_data_dir.stat.exists == false or postgresql_data_dir_contents.stdout == ""
 
 - name: Start and enable PostgreSQL service
   service: name=postgresql state=started enabled=yes
+
+- name: Locate pg_hba.conf
+  find:
+    paths: /etc/postgresql
+    patterns: pg_hba.conf
+    recurse: yes
+  register: pg_hba_conf_search
+
+- name: Set pg_hba_conf path variable
+  set_fact:
+    pg_hba_conf: "{{ pg_hba_conf_search.files[0].path }}"
+  when: pg_hba_conf_search.matched > 0
+
+- name: Fail if pg_hba.conf is not found
+  fail:
+    msg: "pg_hba.conf not found"
+  when: pg_hba_conf_search.matched == 0
 
 - name: Update pg_hba.conf to allow password authentication for postgres user
   lineinfile:
@@ -42,6 +86,23 @@
     state: present
   become_user: postgres
   notify: Restart PostgreSQL
+
+- name: Locate postgresql.conf
+  find:
+    paths: /etc/postgresql
+    patterns: postgresql.conf
+    recurse: yes
+  register: postgresql_conf_search
+
+- name: Set postgresql.conf path variable
+  set_fact:
+    postgresql_conf: "{{ postgresql_conf_search.files[0].path }}"
+  when: postgresql_conf_search.matched > 0
+
+- name: Fail if postgresql.conf is not found
+  fail:
+    msg: "postgresql.conf not found"
+  when: postgresql_conf_search.matched == 0
 
 - name: Allow remote connections in pg_hba.conf
   lineinfile:
@@ -62,11 +123,9 @@
   notify: Restart PostgreSQL
 
 - name: Create a PostgreSQL database
-  postgresql_db: 
+  postgresql_db:
     name: "{{ db_name }}"
     state: present
-    # login_user: "{{ db_user }}"
-    # login_password: "{{ db_pass }}"
   become_user: postgres
 
 - name: Create a PostgreSQL user
@@ -77,7 +136,7 @@
     name: "{{db_user}}"
     state: present
   become_user: postgres
-
+  
 - name: Create the secrets directory
   file: 
     path: "{{ secret_dir }}"
