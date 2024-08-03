@@ -104,13 +104,23 @@
     owner: hng
     group: hng
 
-- name: Run Golang application as hng user
-  shell: sudo -u hng /opt/stage_5b/"{{ go_binary }}" &
-  args:
-    chdir: /opt/stage_5b/
-  async: 0
-  poll: 0
-  register: golang_app_result
+# - name: Run Golang application as hng user
+#   shell: sudo -u hng /opt/stage_5b/"{{ go_binary }}" &
+#   args:
+#     chdir: /opt/stage_5b/
+#   async: 0
+#   poll: 0
+#   register: golang_app_result
+
+- name: copy golang service file to systemd
+  copy:
+    src: ./templates/golang-app.service.j2
+    dest: /etc/systemd/system/golang-app.service
+
+- name: start golang app service
+  service:
+    name: golang-app
+    state: started
 
 - name: Wait for Golang application to start
   pause:

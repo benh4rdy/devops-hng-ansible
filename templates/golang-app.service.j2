@@ -1,0 +1,14 @@
+[Unit]
+Description=Golang Application Service
+After=network.target
+
+[Service]
+Type=simple
+ExecStart="{{ app_log_directory }}/{{ go_binary }}"
+Restart=always
+User=hng
+StandardOutput=append:"{{ app_out_log }}"
+StandardError=append:"{{ app_error_log }}"
+
+[Install]
+WantedBy=multi-user.target
